@@ -14,6 +14,8 @@ class HomeTests(TestCase):
         view = resolve('/')
         self.assertEquals(view.func, home)
 
+
+class BoardTopicsTests(TestCase):
     def setUp(self) -> None:
         Board.objects.create(name='Django', description='Django board.')
 
