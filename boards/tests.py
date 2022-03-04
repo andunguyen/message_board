@@ -1,6 +1,9 @@
 from django.urls import reverse
 from django.urls import resolve
 from django.test import TestCase
+from django.contrib.auth.models import User
+
+from .forms import NewTopicForm
 from .views import home, board_topics, new_topic
 from .models import Board, Topic, Post
 
@@ -51,6 +54,7 @@ class BoardTopicsTests(TestCase):
 class NewTopicTests(TestCase):
     def setUp(self) -> None:
         Board.objects.create(name="Django", description="Django board.")
+        User.objects.create_user(username='john', email='john@doe.com', password='123')
 
     def test_new_topic_view_success_status_code(self):
         url = reverse('new_topic', kwargs={'pk': 1})
@@ -93,7 +97,7 @@ class NewTopicTests(TestCase):
             'subject': 'Test title',
             'message': 'Lorem ipsum dolor sit amet'
         }
-        self.client.post(url, data)
+        response = self.client.post(url, data)
         self.assertTrue(Topic.objects.exists())
         self.assertTrue(Post.objects.exists())
 
@@ -104,7 +108,9 @@ class NewTopicTests(TestCase):
         '''
         url = reverse('new_topic', kwargs={'pk': 1})
         response = self.client.post(url, {})
+        form = response.context.get('form')
         self.assertEquals(response.status_code, 200)
+        self.assertTrue(form.errors)
 
     def test_new_topic_invalid_post_data_empty_fields(self):
         '''
@@ -120,3 +126,9 @@ class NewTopicTests(TestCase):
         self.assertEquals(response.status_code, 200)
         self.assertFalse(Topic.objects.exists())
         self.assertFalse(Post.objects.exists())
+
+    def test_contains_form(self):  # <- new test
+        url = reverse('new_topic', kwargs={'pk': 1})
+        response = self.client.get(url)
+        form = response.context.get('form')
+        self.assertIsInstance(form, NewTopicForm)
