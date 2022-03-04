@@ -2,7 +2,7 @@ from django.urls import reverse
 from django.urls import resolve
 from django.test import TestCase
 from .views import home, board_topics, new_topic
-from .models import Board
+from .models import Board, Topic, Post
 
 
 class HomeTests(TestCase):
@@ -93,7 +93,7 @@ class NewTopicTests(TestCase):
             'subject': 'Test title',
             'message': 'Lorem ipsum dolor sit amet'
         }
-        response = self.client.post(url, data)
+        self.client.post(url, data)
         self.assertTrue(Topic.objects.exists())
         self.assertTrue(Post.objects.exists())
 
