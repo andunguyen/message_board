@@ -1,8 +1,7 @@
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import NewTopicForm
-from .models import Board, Post
+from .models import Board, Post, Topic
 
 
 # Create your views here.
@@ -14,6 +13,11 @@ def home(request):
 def board_topics(request, pk):
     board = get_object_or_404(Board, pk=pk)
     return render(request, 'topics.html', {'board': board})
+
+
+def topic_posts(request, pk, topic_pk):
+    topic = get_object_or_404(Topic, board__pk=pk, pk=topic_pk)
+    return render(request, 'topic_posts.html', {'topic': topic})
 
 
 @login_required
